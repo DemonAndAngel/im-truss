@@ -33,9 +33,11 @@ func MakeGRPCServer(endpoints Endpoints, options ...grpctransport.ServerOption) 
 		grpctransport.ServerBefore(metadataToContext),
 	}
 	serverOptions = append(serverOptions, options...)
+	{{- if gt (len .Service.Methods) 1 }}
 	// 链路跟踪
 	tracer := opentracing.GlobalTracer() // no-op
 	logger := logger.NewNopLogger()
+	{{- end}}
 	return &grpcServer{
 	// {{ ToLower .Service.Name }}
 	{{range $i := .Service.Methods}}
