@@ -4,7 +4,7 @@
 // Version Date: {{.VersionDate}}
 
 // Package grpc provides a gRPC client for the {{.Service.Name}} service.
-package {{ToLower .Service.Name}}
+package grpc
 
 import (
 	"context"
