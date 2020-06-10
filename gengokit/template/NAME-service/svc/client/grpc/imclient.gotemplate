@@ -8,23 +8,22 @@ package grpc
 
 import (
 	"context"
-	"github.com/go-kit/kit/endpoint"
 	"google.golang.org/grpc"
 	grpctransport "github.com/go-kit/kit/transport/grpc"
+	"{{.ImportPath -}} /svc"
+	pb "{{.PBImportPath -}}"
+	// 链路跟踪
+	logger "github.com/go-kit/kit/log"
+	kitot "github.com/go-kit/kit/tracing/opentracing"
+	"github.com/opentracing/opentracing-go"
+	"google.golang.org/grpc/metadata"
 )
 
-// 端点结构体
-type Endpoints struct {
-	{{- range $i := .Service.Methods}}
-	{{- if ne $i.Name "Ping" }}
-	{{$i.Name}}Endpoint endpoint.Endpoint
-	{{- end }}
-	{{- end}}
-}
-
 // 创建客户端实例
-func NewClient(conn *grpc.ClientConn, options ...grpctransport.ClientOption) (Endpoints) {
-	return Endpoints{
+func NewClient(conn *grpc.ClientConn, requestId string, options ...grpctransport.ClientOption) (pb.{{.Service.Name}}Server, error) {
+	logger := logger.NewNopLogger()
+	tracer := opentracing.GlobalTracer() // no-op
+	client := svc.Endpoints{
 		{{- with $te := .}}
 		{{- range $i := .Service.Methods}}
 		{{- if ne $i.Name "Ping" }}
@@ -34,45 +33,27 @@ func NewClient(conn *grpc.ClientConn, options ...grpctransport.ClientOption) (En
 			"{{$i.Name}}",
 			EncodeGRPC{{$i.Name}}Request,
 			DecodeGRPC{{$i.Name}}Response,
-			{{GoName $i.ResponseType.Name}}{},
-			options...,
+			pb.{{GoName $i.ResponseType.Name}}{},
+			append(options, grpctransport.ClientBefore(kitot.ContextToGRPC(tracer, logger)), grpctransport.ClientBefore(ContextRequestToGRPC(requestId)))...,
 		).Endpoint(),
 		{{- end }}
 		{{- end}}
 		{{- end}}
 	}
+	{{- with $te := .}}
+	{{- range $i := .Service.Methods}}
+	{{- if ne $i.Name "Ping" }}
+	client.{{$i.Name}}Endpoint = kitot.TraceClient(tracer, "{{$i.Name}}")(client.{{$i.Name}}Endpoint)
+	{{- end }}
+	{{- end}}
+	{{- end}}
+	return client, nil
 }
 
-
-// 端点函数
-{{- range $i := .Service.Methods}}
-{{- if ne $i.Name "Ping" }}
-func (e Endpoints) {{$i.Name}}(ctx context.Context, in *{{GoName $i.RequestType.Name}}) (*{{GoName $i.ResponseType.Name}}, error) {
-	response, err := e.{{$i.Name}}Endpoint(ctx, in)
-	if err != nil {
-		return nil, err
+func ContextRequestToGRPC(requsetId string) func(ctx context.Context, md *metadata.MD) context.Context {
+	return func(ctx context.Context, md *metadata.MD) context.Context {
+		md.Set("request-id", requsetId)
+		ctx = metadata.NewIncomingContext(ctx, *md)
+		return ctx
 	}
-	return response.(*{{GoName $i.ResponseType.Name}}), nil
 }
-{{- end }}
-{{- end}}
-
-// 客户点响应解码函数
-{{- range $i := .Service.Methods}}
-{{- if ne $i.Name "Ping" }}
-func DecodeGRPC{{$i.Name}}Response(_ context.Context, grpcReply interface{}) (interface{}, error) {
-	reply := grpcReply.(*pb.{{GoName $i.ResponseType.Name}})
-	return reply, nil
-}
-{{- end}}
-{{- end}}
-
-// 客户点请求编码函数
-{{- range $i := .Service.Methods}}
-{{- if ne $i.Name "Ping" }}
-func EncodeGRPC{{$i.Name}}Request(_ context.Context, request interface{}) (interface{}, error) {
-	req := request.(*pb.{{GoName $i.RequestType.Name}})
-	return req, nil
-}
-{{- end}}
-{{- end}}
