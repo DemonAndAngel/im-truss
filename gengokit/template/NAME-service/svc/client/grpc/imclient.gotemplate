@@ -43,7 +43,7 @@ func NewClient(conn *grpc.ClientConn, requestId string, options ...grpctransport
 	{{- with $te := .}}
 	{{- range $i := .Service.Methods}}
 	{{- if ne $i.Name "Ping" }}
-	client.{{$i.Name}}Endpoint = kitot.TraceClient(tracer, "{{$i.Name}}")(client.{{$i.Name}}Endpoint)
+	client.{{$i.Name}}Endpoint = kitot.TraceClient(tracer, "{{$i.Name}}Client")(client.{{$i.Name}}Endpoint)
 	{{- end }}
 	{{- end}}
 	{{- end}}
