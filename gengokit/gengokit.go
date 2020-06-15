@@ -30,6 +30,7 @@ type Config struct {
 // templates and used within those templates.
 var FuncMap = template.FuncMap{
 	"ToLower": strings.ToLower,
+	"ToUpper": strings.ToUpper,
 	"GoName":  generatego.CamelCase,
 }
 

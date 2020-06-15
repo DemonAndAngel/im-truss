@@ -12,11 +12,16 @@ import (
 	grpctransport "github.com/go-kit/kit/transport/grpc"
 	"{{.ImportPath -}} /svc"
 	pb "{{.PBImportPath -}}"
+	"os"
 	// 链路跟踪
 	logger "github.com/go-kit/kit/log"
 	kitot "github.com/go-kit/kit/tracing/opentracing"
 	"github.com/opentracing/opentracing-go"
 	"google.golang.org/grpc/metadata"
+)
+
+const (
+	DEFAULT_{{ToUpper .Service.Name}}_SERVICE_ADDR = `{{.PackageName}}-service:5040`
 )
 
 // 创建客户端实例
@@ -56,4 +61,37 @@ func ContextRequestToGRPC(requsetId string) func(ctx context.Context, md *metada
 		ctx = metadata.NewIncomingContext(ctx, *md)
 		return ctx
 	}
+}
+
+
+
+{{- with $te := .}}
+{{- range $i := .Service.Methods}}
+{{- if ne $i.Name "Ping" }}
+func {{$i.Name}}(ctx context.Context, requestId string, req *pb.{{GoName $i.RequestType.Name}}) (resp *pb.{{GoName $i.ResponseType.Name}}, err error) {
+	addr := getEnv("{{ToUpper $te.Service.Name}}_SERVICE_ADDR", DEFAULT_{{ToUpper $te.Service.Name}}_SERVICE_ADDR)
+	conn, err := grpc.Dial(addr, grpc.WithInsecure())
+	if err != nil {
+		return
+	}
+	// 函数结束时关闭连接
+	defer conn.Close()
+	// 调接口查询制券方
+	client, err := NewClient(conn, requestId)
+	if err != nil {
+		return
+	}
+	resp, err = client.{{$i.Name}}(ctx, req)
+	return
+}
+{{- end }}
+{{- end}}
+{{- end}}
+
+func getEnv(envStr, defaultStr string) (str string) {
+	str, ok := os.LookupEnv(envStr)
+	if !ok || str == "" {
+		str = defaultStr
+	}
+	return
 }
