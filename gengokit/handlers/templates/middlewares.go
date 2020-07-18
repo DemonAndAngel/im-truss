@@ -40,8 +40,8 @@ func WrapEndpoints(in svc.Endpoints) svc.Endpoints {
 	// How to apply a middleware to a single endpoint.
 	// in.ExampleEndpoint = authMiddleware(in.ExampleEndpoint)
 	
-	in.WrapAllLabeledExcept(log.LogServer(SERVICE_NAME), "Ping")
 	tracer := opentracing.GlobalTracer()
+	in.WrapAllLabeledExcept(log.LogServer(SERVICE_NAME), "Ping")
 	in.WrapAllLabeledExcept(tracing.TraceServer(tracer), "Ping")
 	return in
 }
