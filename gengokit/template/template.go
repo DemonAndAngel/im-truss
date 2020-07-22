@@ -3,6 +3,7 @@
 // NAME-service/cmd/NAME/main.gotemplate (356B)
 // NAME-service/handlers/handlers.gotemplate (62B)
 // NAME-service/handlers/hooks.gotemplate (62B)
+// NAME-service/handlers/logs.gotemplate (67B)
 // NAME-service/handlers/middlewares.gotemplate (75B)
 // NAME-service/svc/client/grpc/client.gotemplate (3.184kB)
 // NAME-service/svc/client/grpc/imclient.gotemplate (2.785kB)
@@ -136,6 +137,26 @@ func handlersHooksGotemplate() (*asset, error) {
 
 	info := bindataFileInfo{name: "handlers/hooks.gotemplate", size: 62, mode: os.FileMode(0644), modTime: time.Unix(1464111000, 0)}
 	a := &asset{bytes: bytes, info: info, digest: [32]uint8{0x1e, 0xcb, 0xd5, 0x72, 0x80, 0xc6, 0xf9, 0x82, 0x4b, 0xe0, 0x8b, 0x90, 0xb8, 0x9b, 0xbc, 0x5d, 0x8d, 0x12, 0xd4, 0x8e, 0x54, 0xf6, 0x72, 0xcb, 0xef, 0xf5, 0x12, 0xd0, 0xe1, 0xb8, 0x41, 0xc8}}
+	return a, nil
+}
+
+var _handlersLogsGotemplate = []byte("\x1f\x8b\x08\x00\x00\x00\x00\x00\x00\xff\x04\xc0\x41\x0e\x84\x20\x0c\x05\xd0\xfd\x9c\xa2\x6b\x92\xb1\x87\xf1\x04\x44\xbe\xd5\x88\x7c\x43\xeb\x8a\x70\x77\xdf\x18\x9a\x64\x05\xc4\xf8\x8f\xfe\xba\xab\xa1\x19\xaf\x33\xf4\xc8\xad\x54\x74\xd7\xc0\xfd\xd4\x1c\x70\xad\xb4\xc5\x28\x3b\xbb\x6c\x2c\x90\xa4\x73\xfe\xbe\x00\x00\x00\xff\xff\xb8\x6d\xd2\x3a\x43\x00\x00\x00")
+
+func handlersLogsGotemplateBytes() ([]byte, error) {
+	return bindataRead(
+		_handlersLogsGotemplate,
+		"handlers/logs.gotemplate",
+	)
+}
+
+func handlersLogsGotemplate() (*asset, error) {
+	bytes, err := handlersLogsGotemplateBytes()
+	if err != nil {
+		return nil, err
+	}
+
+	info := bindataFileInfo{name: "handlers/logs.gotemplate", size: 67, mode: os.FileMode(0644), modTime: time.Unix(1464111000, 0)}
+	a := &asset{bytes: bytes, info: info, digest: [32]uint8{0xfc, 0x9b, 0xb0, 0x8c, 0x66, 0x1d, 0x50, 0xe6, 0x3b, 0x78, 0x3, 0xf1, 0xfd, 0x27, 0x42, 0xc9, 0xd5, 0x79, 0x9c, 0x6d, 0x4f, 0xb7, 0x2b, 0xe0, 0x7a, 0x69, 0xb8, 0x88, 0xc0, 0x2b, 0x84, 0xba}}
 	return a, nil
 }
 
@@ -393,6 +414,7 @@ var _bindata = map[string]func() (*asset, error){
 	"cmd/NAME/main.gotemplate":            cmdNameMainGotemplate,
 	"handlers/handlers.gotemplate":        handlersHandlersGotemplate,
 	"handlers/hooks.gotemplate":           handlersHooksGotemplate,
+	"handlers/logs.gotemplate":            handlersLogsGotemplate,
 	"handlers/middlewares.gotemplate":     handlersMiddlewaresGotemplate,
 	"svc/client/grpc/client.gotemplate":   svcClientGrpcClientGotemplate,
 	"svc/client/grpc/imclient.gotemplate": svcClientGrpcImclientGotemplate,
@@ -455,6 +477,7 @@ var _bintree = &bintree{nil, map[string]*bintree{
 	"handlers": &bintree{nil, map[string]*bintree{
 		"handlers.gotemplate":    &bintree{handlersHandlersGotemplate, map[string]*bintree{}},
 		"hooks.gotemplate":       &bintree{handlersHooksGotemplate, map[string]*bintree{}},
+		"logs.gotemplate":        &bintree{handlersLogsGotemplate, map[string]*bintree{}},
 		"middlewares.gotemplate": &bintree{handlersMiddlewaresGotemplate, map[string]*bintree{}},
 	}},
 	"svc": &bintree{nil, map[string]*bintree{
