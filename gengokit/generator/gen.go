@@ -79,12 +79,12 @@ func generateResponseFile(templFP string, data *gengokit.Data, prevFile io.Reade
 		if genCode, err = m.Render(templFP, data); err != nil {
 			return nil, errors.Wrapf(err, "cannot render template: %s", templFP)
 		}
-	case handlers.LogPath:
-		l := handlers.NewLog()
-		l.Load(prevFile)
-		if genCode, err = l.Render(templFP, data); err != nil {
-			return nil, errors.Wrapf(err, "cannot render template: %s", templFP)
-		}
+	// case handlers.LogPath:
+	// 	l := handlers.NewLog()
+	// 	l.Load(prevFile)
+	// 	if genCode, err = l.Render(templFP, data); err != nil {
+	// 		return nil, errors.Wrapf(err, "cannot render template: %s", templFP)
+	// 	}
 	default:
 		if genCode, err = applyTemplateFromPath(templFP, data); err != nil {
 			return nil, errors.Wrapf(err, "cannot render template: %s", templFP)

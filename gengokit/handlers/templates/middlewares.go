@@ -9,7 +9,11 @@ import (
 
 	"github.com/opentracing/opentracing-go"
 	"seller/basis/tracing"
-	"os"
+	"log"
+)
+
+const (
+	SERVICE_NAME = "{{.Service.Name}}Service"
 )
 
 // WrapEndpoints accepts the service's entire collection of endpoints, so that a
@@ -36,7 +40,7 @@ func WrapEndpoints(in svc.Endpoints) svc.Endpoints {
 	// in.ExampleEndpoint = authMiddleware(in.ExampleEndpoint)
 	
 	tracer := opentracing.GlobalTracer()
-	in.WrapAllLabeledExcept(LogServer(), "Ping")
+	// in.WrapAllLabeledExcept(LogServer(), "Ping")
 	in.WrapAllLabeledExcept(tracing.TraceServer(tracer), "Ping")
 	return in
 }
@@ -44,8 +48,7 @@ func WrapEndpoints(in svc.Endpoints) svc.Endpoints {
 func WrapService(in pb.{{.Service.Name}}Server) pb.{{.Service.Name}}Server {
 	_, _, err := tracing.NewJaegerTracer(SERVICE_NAME)
 	if err != nil {
-		LogInstance.SyncELog("main", "启动失败! 链路跟踪异常:"+err.Error())
-		os.Exit(1)
+		log.Fatal("启动失败! 链路跟踪异常:"+err.Error())
 	}
 	return in
 }
