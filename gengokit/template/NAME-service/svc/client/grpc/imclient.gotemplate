@@ -14,7 +14,6 @@ import (
 	pb "{{.PBImportPath -}}"
 	"os"
 	// 链路跟踪
-	logger "github.com/go-kit/kit/log"
 	kitot "github.com/go-kit/kit/tracing/opentracing"
 	"github.com/opentracing/opentracing-go"
 	"google.golang.org/grpc/metadata"
@@ -26,7 +25,6 @@ const (
 
 // 创建客户端实例
 func NewClient(conn *grpc.ClientConn, requestId string, options ...grpctransport.ClientOption) (pb.{{.Service.Name}}Server, error) {
-	logger := logger.NewNopLogger()
 	tracer := opentracing.GlobalTracer() // no-op
 	client := svc.Endpoints{
 		{{- with $te := .}}
@@ -39,7 +37,7 @@ func NewClient(conn *grpc.ClientConn, requestId string, options ...grpctransport
 			EncodeGRPC{{$i.Name}}Request,
 			DecodeGRPC{{$i.Name}}Response,
 			pb.{{GoName $i.ResponseType.Name}}{},
-			append(options, grpctransport.ClientBefore(kitot.ContextToGRPC(tracer, logger)), grpctransport.ClientBefore(ContextRequestToGRPC(requestId)))...,
+			append(options, grpctransport.ClientBefore(kitot.ContextToGRPC(tracer, nil)), grpctransport.ClientBefore(ContextRequestToGRPC(requestId)))...,
 		).Endpoint(),
 		{{- end }}
 		{{- end}}

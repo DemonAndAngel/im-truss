@@ -23,7 +23,6 @@ import (
     // 链路跟踪
 	kitot "github.com/go-kit/kit/tracing/opentracing"
 	"github.com/opentracing/opentracing-go"
-	logger "github.com/go-kit/kit/log"
 	{{- end}}
 )
 
@@ -36,7 +35,6 @@ func MakeGRPCServer(endpoints Endpoints, options ...grpctransport.ServerOption) 
 	{{- if gt (len .Service.Methods) 1 }}
 	// 链路跟踪
 	tracer := opentracing.GlobalTracer() // no-op
-	logger := logger.NewNopLogger()
 	{{- end}}
 	return &grpcServer{
 	// {{ ToLower .Service.Name }}
@@ -48,7 +46,7 @@ func MakeGRPCServer(endpoints Endpoints, options ...grpctransport.ServerOption) 
 			{{- if eq $i.Name "Ping" }}
 			serverOptions...,
 			{{else}}
-        	append(serverOptions, grpctransport.ServerBefore(kitot.GRPCToContext(tracer, "{{$i.Name}}", logger)))...,
+        	append(serverOptions, grpctransport.ServerBefore(kitot.GRPCToContext(tracer, "{{$i.Name}}", nil)))...,
 			{{- end }}
 		),
 	{{- end}}
