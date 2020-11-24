@@ -95,10 +95,16 @@ func generateResponseFile(templFP string, data *gengokit.Data, prevFile io.Reade
 	if err != nil {
 		return nil, err
 	}
-
+	// 找到app.json和app.json.example 那么跳过
+	// 判断是否存在json字符串
+	formattedCode := []byte{}
+	if (strings.Contains(templFP, "json")) {
+		formattedCode = codeBytes
+	}else{
+		formattedCode = formatCode(codeBytes)
+	}
 	// ignore error as we want to write the code either way to inspect after
 	// writing to disk
-	formattedCode := formatCode(codeBytes)
 
 	return bytes.NewReader(formattedCode), nil
 }

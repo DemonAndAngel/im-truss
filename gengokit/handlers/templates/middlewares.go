@@ -7,13 +7,7 @@ import (
 	"{{.ImportPath -}} /svc"
 	pb "{{.PBImportPath -}}"
 
-	"github.com/opentracing/opentracing-go"
 	"seller/basis/tracing"
-	"log"
-)
-
-const (
-	SERVICE_NAME = "{{.Service.Name}}Service"
 )
 
 // WrapEndpoints accepts the service's entire collection of endpoints, so that a
@@ -39,17 +33,12 @@ func WrapEndpoints(in svc.Endpoints) svc.Endpoints {
 	// How to apply a middleware to a single endpoint.
 	// in.ExampleEndpoint = authMiddleware(in.ExampleEndpoint)
 	
-	tracer := opentracing.GlobalTracer()
 	// in.WrapAllLabeledExcept(LogServer(), "Ping")
-	in.WrapAllLabeledExcept(tracing.TraceServer(tracer), "Ping")
+	in.WrapAllLabeledExcept(tracing.TraceServer(), "Ping")
 	return in
 }
 
 func WrapService(in pb.{{.Service.Name}}Server) pb.{{.Service.Name}}Server {
-	_, _, err := tracing.NewJaegerTracer(SERVICE_NAME)
-	if err != nil {
-		log.Fatal("启动失败! 链路跟踪异常:"+err.Error())
-	}
 	return in
 }
 `

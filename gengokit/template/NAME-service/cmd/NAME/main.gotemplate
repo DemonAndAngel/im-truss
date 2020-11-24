@@ -10,6 +10,8 @@ import (
 
 	// This Service
 	"{{.ImportPath -}} /svc/server"
+	// This Config
+	_ "{{.ImportPath -}} /config"
 )
 
 func main() {
