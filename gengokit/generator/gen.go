@@ -79,6 +79,24 @@ func generateResponseFile(templFP string, data *gengokit.Data, prevFile io.Reade
 		if genCode, err = m.Render(templFP, data); err != nil {
 			return nil, errors.Wrapf(err, "cannot render template: %s", templFP)
 		}
+	case handlers.ConfigPath:
+		c := handlers.NewConfig()
+		c.Load(prevFile)
+		if genCode, err = c.Render(templFP, data); err != nil {
+			return nil, errors.Wrapf(err, "cannot render template: %s", templFP)
+		}
+	// case handlers.ConfigAppJsonExamplePath:
+	// 	c := handlers.NewConfig()
+	// 	c.Load(prevFile)
+	// 	if genCode, err = c.Render(templFP, data); err != nil {
+	// 		return nil, errors.Wrapf(err, "cannot render template: %s", templFP)
+	// 	}
+	// case handlers.ConfigAppJsonPath:
+	// 	c := handlers.NewConfig()
+	// 	c.Load(prevFile)
+	// 	if genCode, err = c.Render(templFP, data); err != nil {
+	// 		return nil, errors.Wrapf(err, "cannot render template: %s", templFP)
+	// 	}
 	// case handlers.LogPath:
 	// 	l := handlers.NewLog()
 	// 	l.Load(prevFile)

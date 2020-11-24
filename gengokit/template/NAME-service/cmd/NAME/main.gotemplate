@@ -7,11 +7,11 @@ package main
 
 import (
 	"flag"
-
-	// This Service
-	"{{.ImportPath -}} /svc/server"
+	
 	// This Config
 	_ "{{.ImportPath -}} /config"
+	// This Service
+	"{{.ImportPath -}} /svc/server"
 )
 
 func main() {
