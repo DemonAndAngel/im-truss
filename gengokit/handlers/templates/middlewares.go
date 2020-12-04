@@ -7,7 +7,7 @@ import (
 	"{{.ImportPath -}} /svc"
 	pb "{{.PBImportPath -}}"
 
-	"seller/basis/tracing"
+	"go-common/tools/tracing"
 )
 
 // WrapEndpoints accepts the service's entire collection of endpoints, so that a

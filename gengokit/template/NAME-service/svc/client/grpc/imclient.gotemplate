@@ -9,87 +9,34 @@ package grpc
 import (
 	"context"
 	"google.golang.org/grpc"
-	grpctransport "github.com/go-kit/kit/transport/grpc"
-	"{{.ImportPath -}} /svc"
-	pb "{{.PBImportPath -}}"
-	"os"
-	// 链路跟踪
-	kitot "github.com/go-kit/kit/tracing/opentracing"
+	pb "go-common/services/{{.PBImportPath -}}/PB"
 	"github.com/opentracing/opentracing-go"
-	"google.golang.org/grpc/metadata"
+	"go-common/tools/tracing"
+	"go-common/tools/helpers"
 )
 
 const (
 	DEFAULT_{{ToUpper .Service.Name}}_SERVICE_ADDR = `{{.PackageName}}-service:5040`
 )
-
-// 创建客户端实例
-func NewClient(conn *grpc.ClientConn, requestId string, options ...grpctransport.ClientOption) (pb.{{.Service.Name}}Server, error) {
-	tracer := opentracing.GlobalTracer() // no-op
-	client := svc.Endpoints{
-		{{- with $te := .}}
-		{{- range $i := .Service.Methods}}
-		{{- if ne $i.Name "Ping" }}
-		{{$i.Name}}Endpoint: grpctransport.NewClient(
-			conn,
-			"{{$te.PackageName}}.{{$te.Service.Name}}",
-			"{{$i.Name}}",
-			EncodeGRPC{{$i.Name}}Request,
-			DecodeGRPC{{$i.Name}}Response,
-			pb.{{GoName $i.ResponseType.Name}}{},
-			append(options, grpctransport.ClientBefore(kitot.ContextToGRPC(tracer, nil)), grpctransport.ClientBefore(ContextRequestToGRPC(requestId)))...,
-		).Endpoint(),
-		{{- end }}
-		{{- end}}
-		{{- end}}
-	}
-	{{- with $te := .}}
-	{{- range $i := .Service.Methods}}
-	{{- if ne $i.Name "Ping" }}
-	client.{{$i.Name}}Endpoint = kitot.TraceClient(tracer, "{{$i.Name}}Client")(client.{{$i.Name}}Endpoint)
-	{{- end }}
-	{{- end}}
-	{{- end}}
-	return client, nil
-}
-
-func ContextRequestToGRPC(requsetId string) func(ctx context.Context, md *metadata.MD) context.Context {
-	return func(ctx context.Context, md *metadata.MD) context.Context {
-		md.Set("request-id", requsetId)
-		ctx = metadata.NewIncomingContext(ctx, *md)
-		return ctx
-	}
-}
-
-
-
 {{- with $te := .}}
 {{- range $i := .Service.Methods}}
-{{- if ne $i.Name "Ping" }}
 func {{$i.Name}}(ctx context.Context, requestId string, req *pb.{{GoName $i.RequestType.Name}}) (resp *pb.{{GoName $i.ResponseType.Name}}, err error) {
-	addr := getEnv("{{ToUpper $te.Service.Name}}_SERVICE_ADDR", DEFAULT_{{ToUpper $te.Service.Name}}_SERVICE_ADDR)
-	conn, err := grpc.Dial(addr, grpc.WithInsecure())
+	addr := helpers.GetConfigToString("services.{{ToLower $te.Service.Name}}.addr", "DEFAULT_{{ToUpper $te.Service.Name}}_SERVICE_ADDR")
+	if addr == "" {
+		addr = DEFAULT_{{ToUpper $te.Service.Name}}_SERVICE_ADDR
+	}
+	tracer := opentracing.GlobalTracer() // no-op
+	conn, err := grpc.DialContext(ctx, addr, grpc.WithInsecure(), 
+	grpc.WithChainUnaryInterceptor(tracing.ClientJaegerInterceptor(tracer, "{{$i.Name}}Client"), tracing.ClientRequestIdInterceptor(requestId)))
 	if err != nil {
 		return
 	}
 	// 函数结束时关闭连接
 	defer conn.Close()
 	// 调接口查询制券方
-	client, err := NewClient(conn, requestId)
-	if err != nil {
-		return
-	}
+	client := pb.New{{$te.Service.Name}}Client(conn)
 	resp, err = client.{{$i.Name}}(ctx, req)
 	return
 }
-{{- end }}
 {{- end}}
 {{- end}}
-
-func getEnv(envStr, defaultStr string) (str string) {
-	str, ok := os.LookupEnv(envStr)
-	if !ok || str == "" {
-		str = defaultStr
-	}
-	return
-}

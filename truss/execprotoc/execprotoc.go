@@ -104,6 +104,7 @@ func protoc(protoPaths, gopath []string, plugin string) error {
 	var cmdArgs []string
 
 	cmdArgs = append(cmdArgs, "--proto_path="+filepath.Dir(protoPaths[0]))
+	cmdArgs = append(cmdArgs, "--proto_path=..")
 
 	for _, gp := range gopath {
 		cmdArgs = append(cmdArgs, "-I"+filepath.Join(gp, "src"))

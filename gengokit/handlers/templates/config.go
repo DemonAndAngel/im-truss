@@ -9,10 +9,10 @@ import (
 	"github.com/spf13/viper"
 	"github.com/fsnotify/fsnotify"
 	"log"
-	"seller/basis/db"
-	es "seller/basis/elasticsearch"
-	"seller/basis/tracing"
-	"seller/basis/redis"
+	"go-common/tools/db"
+	es "go-common/tools/elasticsearch"
+	"go-common/tools/tracing"
+	"go-common/tools/redis"
 	"errors"
 )
 

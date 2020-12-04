@@ -9,7 +9,9 @@ require (
 	github.com/go-logfmt/logfmt v0.4.0 // indirect
 	github.com/gogo/protobuf v1.3.1
 	github.com/gorilla/mux v1.7.3
+	github.com/kevinburke/go-bindata v3.22.0+incompatible // indirect
 	github.com/moul/http2curl v1.0.0
+	github.com/opentracing/opentracing-go v1.2.0
 	github.com/pkg/errors v0.8.1
 	github.com/pmezard/go-difflib v1.0.0
 	github.com/sirupsen/logrus v1.4.2

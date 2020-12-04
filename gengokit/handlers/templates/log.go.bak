@@ -5,7 +5,7 @@ const Log = `
 package handlers
 
 import(
-	"seller/basis/log"
+	"go-common/tools/log"
 	"github.com/go-kit/kit/endpoint"
 )
 
