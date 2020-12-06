@@ -20,10 +20,12 @@ const (
 )
 {{- with $te := .}}
 {{- range $i := .Service.Methods}}
-func {{$i.Name}}(ctx context.Context, requestId string, req *pb.{{GoName $i.RequestType.Name}}) (resp *pb.{{GoName $i.ResponseType.Name}}, err error) {
-	addr := helpers.GetConfigToString("services.{{ToLower $te.Service.Name}}.addr", "DEFAULT_{{ToUpper $te.Service.Name}}_SERVICE_ADDR")
+func {{$i.Name}}(addr string, ctx context.Context, requestId string, req *pb.{{GoName $i.RequestType.Name}}) (resp *pb.{{GoName $i.ResponseType.Name}}, err error) {
 	if addr == "" {
-		addr = DEFAULT_{{ToUpper $te.Service.Name}}_SERVICE_ADDR
+		addr = helpers.GetConfigToString("services.{{ToLower $te.Service.Name}}.addr", "DEFAULT_{{ToUpper $te.Service.Name}}_SERVICE_ADDR")
+		if addr == "" {
+			addr = DEFAULT_{{ToUpper $te.Service.Name}}_SERVICE_ADDR
+		}
 	}
 	tracer := opentracing.GlobalTracer() // no-op
 	conn, err := grpc.DialContext(ctx, addr, grpc.WithInsecure(), 
