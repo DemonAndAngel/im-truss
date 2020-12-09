@@ -227,6 +227,7 @@ func headersToContext(ctx context.Context, r *http.Request) context.Context {
 	// also add the request url
 	ctx = context.WithValue(ctx, "request-url", r.URL.Path)
 	ctx = context.WithValue(ctx, "transport", "HTTPJSON")
+	ctx = context.WithValue(ctx, "request-method", r.Method)
 
 	return ctx
 }
