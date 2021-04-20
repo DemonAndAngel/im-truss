@@ -13,6 +13,7 @@ import (
 	"net"
 	"net/http"
 	"net/http/pprof"
+	"time"
 
 	// 3d Party
 	"google.golang.org/grpc"
@@ -109,7 +110,13 @@ func Run(cfg Config) {
 	go func() {
 		log.Println("transport", "HTTP", "addr", cfg.HTTPAddr)
 		h := svc.MakeHTTPHandler(endpoints)
-		errc <- http.ListenAndServe(cfg.HTTPAddr, h)
+		srv := &http.Server{
+            Addr: cfg.HTTPAddr,
+            Handler: h,
+            ReadTimeout: 10 * time.Second,
+            WriteTimeout: 30 * time.Second,
+        }
+        errc <- srv.ListenAndServe()
 	}()
 
 	// gRPC transport.
