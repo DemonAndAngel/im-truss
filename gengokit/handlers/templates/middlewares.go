@@ -8,6 +8,7 @@ import (
 	pb "{{.PBImportPath -}}"
 
 	"go-common/tools/tracing"
+	"go-common/tools/logger"
 )
 
 // WrapEndpoints accepts the service's entire collection of endpoints, so that a
@@ -34,6 +35,7 @@ func WrapEndpoints(in svc.Endpoints) svc.Endpoints {
 	// in.ExampleEndpoint = authMiddleware(in.ExampleEndpoint)
 	
 	// in.WrapAllLabeledExcept(LogServer(), "Ping")
+	in.WrapAllLabeledExcept(logger.RecordServer(), "Ping")
 	in.WrapAllLabeledExcept(tracing.TraceServer(), "Ping")
 	return in
 }

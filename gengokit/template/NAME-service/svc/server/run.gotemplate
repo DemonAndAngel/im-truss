@@ -9,7 +9,7 @@ import (
 	"flag"
 	"fmt"
 	"go-common/tools/logger"
-	"log"
+	"time"
 	"net"
 	"net/http"
 	"net/http/pprof"
