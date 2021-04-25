@@ -6,38 +6,44 @@ const Config = `
 package config
 
 import (
-	"github.com/spf13/viper"
+	"context"
+	"errors"
 	"github.com/fsnotify/fsnotify"
-	"log"
+	redisPkg "github.com/go-redis/redis/v8"
+	"github.com/spf13/viper"
 	"go-common/tools/db"
 	es "go-common/tools/elasticsearch"
-	"go-common/tools/tracing"
+	"go-common/tools/loger"
 	"go-common/tools/redis"
-	"errors"
+	"go-common/tools/tracing"
+	"os"
+	"time"
 )
 
 // 加载配置文件
 func init() {
-	log.Println("加载配置文件...")
+	logger.Info("ConfigInit", "SUCCESS", "加载配置文件", nil)
     viper.SetConfigName("app")
 	viper.SetConfigType("json")
 	viper.AddConfigPath("./config")
 	if err := viper.ReadInConfig(); err != nil {
-		log.Fatal("加载配置文件失败;信息:" + err.Error())
+		logger.Error("ConfigInit", "LOAD_FAIL", "加载配置文件失败;异常信息:" + err.Error(), nil)
 	}
 	// 使用配置
 	if err := ConnResources(); err != nil {
-		log.Fatal(err.Error())
+		logger.Error("ConfigInit", "USE_FAIL", "应用配置文件失败;异常信息:" + err.Error(), nil)
+		time.Sleep(time.Second * 3)
+		os.Exit(0)
 	}
 	// 配置监听
 	viper.WatchConfig()
 	viper.OnConfigChange(func(e fsnotify.Event) {
-		log.Println("配置文件变更", e.Name)
+		logger.Info("ConfigInit", "SUCCESS", "配置文件变更", nil)
 		if err := ConnResources(); err != nil {
-			log.Println(err.Error())
+			logger.Error("ConfigInit", "RELOAD_USE_FAIL", "重新加载配置文件失败;异常信息:" + err.Error(), nil)
 		}
 	})
-	log.Println("成功加载配置文件,并监听变更中...")
+	logger.Info("ConfigInit", "SUCCESS", "成功加载配置文件,并监听变更中...", nil)
 }
 
 func ConnResources() (error) {

@@ -21,6 +21,8 @@ const (
 {{- with $te := .}}
 {{- range $i := .Service.Methods}}
 func {{$i.Name}}(addr string, ctx context.Context, requestId string, req *pb.{{GoName $i.RequestType.Name}}) (resp *pb.{{GoName $i.ResponseType.Name}}, err error) {
+	ctx, cancel := context.WithTimeout(ctx, 30 * time.Second)
+	defer cancel()
 	if addr == "" {
 		addr = helpers.GetConfigToString("services.{{ToLower $te.Service.Name}}.addr", "DEFAULT_{{ToUpper $te.Service.Name}}_SERVICE_ADDR")
 		if addr == "" {
