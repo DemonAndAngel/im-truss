@@ -6,14 +6,12 @@ const Config = `
 package config
 
 import (
-	"context"
 	"errors"
 	"github.com/fsnotify/fsnotify"
-	redisPkg "github.com/go-redis/redis/v8"
 	"github.com/spf13/viper"
 	"go-common/tools/db"
 	es "go-common/tools/elasticsearch"
-	"go-common/tools/loger"
+	"go-common/tools/logger"
 	"go-common/tools/redis"
 	"go-common/tools/tracing"
 	"os"
